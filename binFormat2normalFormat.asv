@@ -47,12 +47,81 @@ function binFormat2normalFormat()
         index=index+1;
     end
     
+%     %copy the coord into an image
+%     disp('find the BoundaryLine and write it to a image');
+%     threshold = zeros(1,500);
+%     threshold(1,:)=0.99;
+%     threshold(1,246)=0.98;
+%     
+% % the result matrix, tooltips: matrix is saved in matrix in colume domain
+%     v_p_set = zeros(nonzeros_size,3)';
+%     v_n_set = zeros(nonzeros_size,3)';
+%     nonzeros_row_index = 1;    
+%  
+% 
+%     %the first level   
+%     level=1;
+%     level_one = mem3D(level,:,:);
+%     level_one = reshape(level_one,height,width);
+%     [nonzeros_row_level_one, nonzeros_col_level_one]=find(level_one);
+%     non_zeros_one_size = size(nonzeros_row_level_one,1);
+% 
+%     p_set = zeros(non_zeros_one_size,3);
+%     n_set = zeros(non_zeros_one_size,3);
+%     for i = 1:non_zeros_one_size
+%         row = nonzeros_row_level_one(i);
+%         col = nonzeros_col_level_one(i);
+%         p_set(i,1)=col;
+%         p_set(i,2)=row;
+%         p_set(i,3)=level;
+%         n_set(i,1)=0;
+%         n_set(i,2)=0;
+%         n_set(i,3)=-1;
+%     end
+%     row_index_end = nonzeros_row_index + numel(p_set) - 1;
+%     v_p_set(nonzeros_row_index:row_index_end) = p_set';
+%     v_n_set(nonzeros_row_index:row_index_end) = n_set';
+%     nonzeros_row_index = row_index_end + 1;
+%     
+% 
+% %     middle level
+%     for level =2:499
+%         [vertex_position, vertex_normal] = findBoundaryLine(mem3D,level,width,height,threshold);
+%         row_index_end = nonzeros_row_index + numel(vertex_position) - 1;
+%         v_p_set(nonzeros_row_index:row_index_end) = vertex_position';
+%         v_n_set(nonzeros_row_index:row_index_end) = vertex_normal';
+%         nonzeros_row_index = row_index_end + 1;
+%     end
+% 
+% %     the last level
+%     level=500;
+%     level_last = mem3D(level,:,:);
+%     level_last = reshape(level_last,height,width);
+%     [nonzeros_row_level_last, nonzeros_col_level_last]=find(level_last);
+%     non_zeros_last_size = size(nonzeros_row_level_last,1);
+%     if non_zeros_last_size ~=0
+%         p_set = zeros(non_zeros_last_size,3);
+%         n_set = zeros(non_zeros_last_size,3);
+%         for i = 1:non_zeros_last_size
+%             row = nonzeros_row_level_last(i);
+%             col = nonzeros_col_level_last(i);
+%             p_set(i,1)=col;
+%             p_set(i,2)=row;
+%             p_set(i,3)=level;
+%             n_set(i,1)=0;
+%             n_set(i,2)=0;
+%             n_set(i,3)=1;
+%         end
+%         row_index_end = nonzeros_row_index + numel(p_set) - 1;
+%         v_p_set(nonzeros_row_index:row_index_end) = p_set';
+%         v_n_set(nonzeros_row_index:row_index_end) = n_set';
+%     end
     top_level_normal = [0,0,-1];
     bottom_level_normal = [0,0,1];
     [v_p_set, v_n_set] = obtain_consistency_normal(mem3D, top_level_normal, bottom_level_normal,top_level,bottom_level);
-    vertices_size = size(v_p_set,2)/channel;
-    v_p_set=reshape(v_p_set,3,vertices_size)';
-    v_n_set=reshape(v_n_set,3,vertices_size)';
+    vertices_size = size(v_p_set)/
+    v_p_set=reshape(v_p_set,3,nonzeros_size)';
+    v_n_set=reshape(v_n_set,3,nonzeros_size)';
     write_ply_only_vertices('D:\\Users\\documents\\MATLAB\\ScritpResult\\left_leg.ply',v_p_set,v_n_set);
 
 
@@ -88,7 +157,6 @@ function [vertices,normals] = obtain_consistency_normal(mem3D, top_level_normal,
     row_index_end = nonzeros_row_index + numel(n_set) - 1;
     normals(nonzeros_row_index:row_index_end) = n_set';
     vertices(nonzeros_row_index:row_index_end) = p_set';
-    nonzeros_row_index = row_index_end + 1;
     
     %middle levels
     for level = top_level+1: bottom_level-1
@@ -215,19 +283,19 @@ function [vertex_position, vertex_normal]=findBoundaryLine(mem3D,level,width,hei
     zAxis=[0,0,-1];
     vertex_normal=getNormal(order_position,ordered_index ,zAxis);
 
-%     disp('Show the normal');
-%     figure
-%     imshow(image);
-%     hold on
-%     plot(vertex_position(:,1),vertex_position(:,2),'Color','Red','LineWidth',2);
-%     hold on
-%     quiver(vertex_position(:,1),vertex_position(:,2),vertex_normal(:,1),vertex_normal(:,2));
-%     hold off
-% 
-%     image_path = 'D:\\Users\\documents\\MATLAB\\ScritpResult\\BoundaryLine\\';
-%     image_name = [image_path num2str(level) '.jpg']
-%     saveas(gca,image_name);
-%     close;
+    disp('Show the normal');
+    figure
+    imshow(image);
+    hold on
+    plot(vertex_position(:,1),vertex_position(:,2),'Color','Red','LineWidth',2);
+    hold on
+    quiver(vertex_position(:,1),vertex_position(:,2),vertex_normal(:,1),vertex_normal(:,2));
+    hold off
+
+    image_path = 'D:\\Users\\documents\\MATLAB\\ScritpResult\\BoundaryLine\\';
+    image_name = [image_path num2str(level) '.jpg']
+    saveas(gca,image_name);
+    close;
 end
 
 function normal = getNormal(ordered_position,count,zAxis)
